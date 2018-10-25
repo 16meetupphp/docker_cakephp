@@ -1,0 +1,45 @@
+version: "3"
+services:
+    postgres:
+        image: wodby/postgres:$POSTGRES_TAG
+        container_name: "${PROJECT_NAME}_postgres"
+        stop_grace_period: 30s
+        environment:
+            POSTGRES_PASSWORD: $DB_PASSWORD
+            POSTGRES_DB: $DB_NAME
+            POSTGRES_USER: $DB_USER
+    php:
+        image: wodby/php:$PHP_TAG
+        container_name: "${PROJECT_NAME}_php"
+        command:
+           - /script.sh
+        links:
+            - postgres
+        environment:
+            DB_HOST: $DB_HOST
+            DB_USER: $DB_USER
+            DB_PASSWORD: $DB_PASSWORD
+            DB_NAME: $DB_NAME
+        volumes:
+            - ./src/app:/var/www/html
+            - ./conf/script.sh:/script.sh
+    apache:
+        image: wodby/apache:$APACHE_TAG
+        container_name: "${PROJECT_NAME}_apache"
+        depends_on:
+            - php
+        expose:
+            - "80"
+        environment:
+            APACHE_LOG_LEVEL: debug
+            APACHE_BACKEND_HOST: php
+            APACHE_VHOST_PRESET: php
+            APACHE_DOCUMENT_ROOT: /var/www/html/webroot
+            VIRTUAL_HOST: "$VIRTUAL_HOST"
+            LETSENCRYPT_HOST: "$SSL_HOST"
+        volumes:
+            - ./src/app:/var/www/html
+networks:
+    default:
+        external:
+            name: nginx-proxy
