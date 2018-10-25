@@ -19,6 +19,7 @@ services:
             DB_USER: $DB_USER
             DB_PASSWORD: $DB_PASSWORD
             DB_NAME: $DB_NAME
+            PHP_DEV: 1
         volumes:
             - ./src/app:/var/www/html
             - ./conf/script.sh:/script.sh

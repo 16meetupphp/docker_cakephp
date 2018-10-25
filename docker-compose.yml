@@ -15,6 +15,7 @@ services:
         links:
             - postgres
         environment:
+            PHP_DEV: 1
             DB_HOST: $DB_HOST
             DB_USER: $DB_USER
             DB_PASSWORD: $DB_PASSWORD
